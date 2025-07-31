@@ -10,7 +10,7 @@ import numpy as np
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from torch.utils.data import DataLoader
 from classifier import ClassifierTrainer
-from eegswintransformer import SwinTransformer
+from model import SwinMI
 
 
 dataset = StrokePatientsMIDataset(root_path='./subdataset',
@@ -39,16 +39,16 @@ from torcheeg.model_selection import KFoldPerSubject
 cv = KFoldPerSubject(n_splits=5, shuffle=True,split_path='.torcheeg/ALLdataset_KFoldPerSubject',random_state=42)
 
 metrics = ['accuracy', 'recall', 'precision', 'f1score','kappa']
-csv_path = 'logs/SwinCam_KFPS_results.csv'
+csv_path = 'logs/SwinMI_KFPS_results.csv'
 os.makedirs(os.path.dirname(csv_path), exist_ok=True)
 
 
 for i, (training_dataset, test_dataset) in enumerate(cv.split(dataset)):
-    model = SwinTransformer(patch_size=(8,3,3),
-                            depths=(2, 6, 4),
-                            num_heads=(3,6,8),
-                            window_size=(3,3,3)
-                            )
+    model = SwinMI(patch_size=(8,3,3),
+                    depths=(2, 6, 4),
+                    num_heads=(3,6,8),
+                    window_size=(3,3,3)
+                    )
     trainer = ClassifierTrainer(model=model,
                                 num_classes=2,
                                 lr=HYPERPARAMETERS['lr'],
